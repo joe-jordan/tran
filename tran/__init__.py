@@ -16,7 +16,7 @@ class Transaction:
     def push(self, function, arguments):
         """add another function call to the transaction. function should be
         callable, and arguments should be a list of non-keyword arguments."""
-        if self.oself:
+        if self.oself != None:
             arguments = [self.oself] + arguments
         self.queue.append({'function' : function, 'arguments' : arguments})
     

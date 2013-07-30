@@ -48,9 +48,29 @@ Object-centric example:
       Out: {4: 'four', 5: 'five'}
     
 
-and finally, note what happens if you accidentally try to commit twice:
+note what happens if you accidentally try to commit twice:
 
     t.commit()
       ErrOut: tran.TransactionError: transaction instance already committed.
 
 To cancel a transaction, simply don't ever call the commit method. The class will *not* call it for you if unresolved when garbage collection occurs; just rebind the name or let it go out of scope.
+
+Networkx example:
+-----------------
+
+*tip:* use `Instance.__class__` to access unbound methods, so that you definitely get the correct type (`nx.Graph` vs `nx.DiGraph` ...)
+
+    import tran, networkx as nx
+    G = nx.DiGraph()
+    t = tran.Transaction(G)
+    t.push(G.__class__.add_cycle, [range(5)])
+    G.nodes()
+      Out: []
+    G.edges()
+      Out: []
+    
+    t.commit()
+    G.nodes()
+      Out: [0, 1, 2, 3, 4]
+    G.edges()
+      Out: [(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)]
