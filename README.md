@@ -3,6 +3,9 @@ tran
 
 SQL Transactions (sort of) for Python (queue up operations and either abort or commit.)
 
+**class Transaction**
+a class to encapsulate SQL-transaction-like behaviour for python function calls. Especially useful for large complex objects whose methods have side effects; like modifying lists, dicts, numpy arrays and networkx Graphs.
+
 Installation
 ------------
 You can run the (very small) test suite with
