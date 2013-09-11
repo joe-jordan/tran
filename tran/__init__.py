@@ -16,8 +16,6 @@ class Transaction:
     def push(self, function, arguments):
         """add another function call to the transaction. function should be
         callable, and arguments should be a list of non-keyword arguments."""
-        if self.oself != None:
-            arguments = [self.oself] + arguments
         self.queue.append({'function' : function, 'arguments' : arguments})
     
     def commit(self):
@@ -27,6 +25,8 @@ class Transaction:
             raise TransactionError('transaction instance already committed.')
         
         self.committed = True
+        
+        oself_args = [] if self.oself == None else [self.oself]
+        
         for qi in self.queue:
-            qi['function'](*qi['arguments'])
-
+            qi['function'](*(oself_args + qi['arguments']))

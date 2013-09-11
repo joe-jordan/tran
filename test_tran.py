@@ -47,18 +47,22 @@ class TestDataObject:
 
 class TestWithFirstArg(unittest.TestCase):
     def setUp(self):
-        self.tran = tran.Transaction(TestDataObject())
+        self.valid_tran = tran.Transaction(TestDataObject())
         # push functions into the queue:
-        self.tran.push(TestDataObject.my_func, [])
+        self.valid_tran.push(TestDataObject.my_func, [])
+        
+        self.invalid_tran = tran.Transaction()
+        self.invalid_tran.push(TestDataObject.my_func, [])
 
-    def test_argument_transfer(self):
-        self.assertEqual(len(self.tran.queue[0]['arguments']), 1)
+    def test_unbound_failure(self):
+        with self.assertRaises(TypeError):
+            self.invalid_tran.commit()
 
     def test_commit(self):
         # running commit on the tran should run my_func, which should
         # raise a SuccessError:
         with self.assertRaises(SuccessError):
-            self.tran.commit()
+            self.valid_tran.commit()
 
 class TestWithEmptyObject(unittest.TestCase):
     def setUp(self):
@@ -66,9 +70,6 @@ class TestWithEmptyObject(unittest.TestCase):
         self.tran = tran.Transaction(self.my_empty_list)
         
         self.tran.push(self.my_empty_list.__class__.append, [5])
-    
-    def test_argument_transfer_for_empty_list(self):
-        self.assertEqual(len(self.tran.queue[0]['arguments']), 2)
     
     def test_commit(self):
         self.tran.commit()
