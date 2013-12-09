@@ -1,5 +1,6 @@
 import tran
 import unittest
+import random
 
 class SuccessError(Exception):
     pass
@@ -9,6 +10,11 @@ class FailureError(Exception):
 
 def dummy_function(a, b):
     raise SuccessError('values: a=' + repr(a) + ' and b=' + repr(b))
+
+def dummy_function_with_kwargs(a, b, c='foo'):
+    e = SuccessError('values a=' + repr(a) + ' and b=' + repr(b))
+    e.c = c
+    raise e
 
 class TestNoFirstArg(unittest.TestCase):
     def setUp(self):
@@ -74,7 +80,21 @@ class TestWithEmptyObject(unittest.TestCase):
     def test_commit(self):
         self.tran.commit()
         self.assertEqual(len(self.my_empty_list), 1)
-        
+
+class TestWithKwArgs(unittest.TestCase):
+    def setUp(self):
+        self.tran = tran.Transaction()
+
+        self.val = random.random()
+        # push functions into the queue:
+        self.tran.push(dummy_function_with_kwargs, [1, 2], {'c' : self.val})
+
+    def test_commit(self):
+        try:
+            self.tran.commit()
+        except SuccessError as e:
+            self.assertEqual(e.c, self.val)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -13,10 +13,14 @@ class Transaction:
         self.queue = []
         self.committed = False
     
-    def push(self, function, arguments):
+    def push(self, function, arguments, kwarguments=None):
         """add another function call to the transaction. function should be
         callable, and arguments should be a list of non-keyword arguments."""
-        self.queue.append({'function' : function, 'arguments' : arguments})
+
+        if kwarguments == None:
+            kwarguments = {}
+
+        self.queue.append({'function' : function, 'arguments' : arguments, 'kwargs' : kwarguments})
     
     def commit(self):
         """run all the queue'd function calls. It is a TransactionError to call
@@ -29,4 +33,4 @@ class Transaction:
         oself_args = [] if self.oself == None else [self.oself]
         
         for qi in self.queue:
-            qi['function'](*(oself_args + qi['arguments']))
+            qi['function'](*(oself_args + qi['arguments']), **qi['kwargs'])
